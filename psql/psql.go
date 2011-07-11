@@ -2,7 +2,7 @@ package psql
 
 import (
 	psql "github.com/lxn/go-pgsql/src/pkg/pgsql"
-	ps "perse"
+	ps "github.com/mjarco/perse"
 	"time"
 	"fmt"
 )

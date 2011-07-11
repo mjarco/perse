@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"testing"
-	ps "perse"
+	ps "github.com/mjarco/perse"
 	//    "fmt"
 	"strconv"
 )

@@ -63,7 +63,7 @@ perse.Date type internally stores *time.Time value so you have to pass date form
 
 ModelType values convertion
 ---------------------------
-It''s one of most important features in perse package. With functions listed below it''s possible to convert ModelType values into map[string]string values and other way round.
+It's one of most important features in perse package. With functions listed below it's possible to convert ModelType values into map[string]string values and other way round.
 *  map[string]string => value:
     *  MapValue
     *  CrudValue
@@ -122,11 +122,10 @@ CRUD:  perse.Save [CU], perse.Get [R], perse.Delete [D]
 All CRUD functions takes a ModelType value and connection in parameters, as mentioned above connection is optional if default connection (perse.Conn variable) was set.
 
 Save, Get and Delete functions realize CRUD. 
-Save make inserts and updates depending if there is non-zero value in Serial field otherwise inserts new record (maybe it''s not the best solution but come on... it'' first release of this package).
+Save make inserts and updates depending if there is non-zero value in Serial field otherwise inserts new record (maybe it's not the best solution but good enough for start).
 
 Get fetches row with id given in Serial field of value and fill this value with proper data. 
 Delete removes record with id given in Serial field of value from table
-
 
 Collections & filters
 ---------------------
@@ -138,10 +137,22 @@ As far we were taking about ModelTypes, but perse has some functionalities that 
         psql "perse/psql", 
         "strconv", 
         "fmt")
+    /**
+     *   Connecting to database
+     */
+    var cd = ps.ConnData
+    func init() {
+        cd = new(ps.ConnData)
+        cd.User = "username"
+        cd.Pass = "password"
+        cd.Name = "dbname" 
+        ps.Conn = psql.NewConnection()//default connection for all method of perse package
+    }
 
     type Test struct { //name of type is name of DB relation by default
         TextField *ps.Char 
         TestId   *ps.Serial
+
     }
 
     func NewTest(text string) *Test {
@@ -164,8 +175,7 @@ As far we were taking about ModelTypes, but perse has some functionalities that 
     }
 
     func main() {
-        conn := psql.NewConnection()
-        ok := ps.Conn.Connect(ps.ConnData{"localhost","3456", "tutorial","tutorial","tutorial",""})
+        ok := ps.Conn.Connect(cd)
         if (!ok) {
             println("connection not established")
             exit(1)
@@ -176,9 +186,11 @@ As far we were taking about ModelTypes, but perse has some functionalities that 
 
 Collection may be created in two other ways. Statemets below are equivalent
 
-1)  c := NewCollection(NewTest(""))
-2)  c := NewCollection("test", "testid", "textfield")
-3)  type testML struct{ fieldNames []string; fieldValues []string}
+1.  c := NewCollection(NewTest(""))
+2.  c := NewCollection("test", "testid", "textfield")
+3.  
+    
+    type testML struct{ fieldNames []string; fieldValues []string}
     func(m *testML) SetValues(vals ... string) { m.fieldValues = vals }
     func(m *testML) Fields() []string { return fieldNames }
     func(m *testML) RelName() string { return "test" }

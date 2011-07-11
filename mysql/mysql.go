@@ -2,7 +2,7 @@ package mysql
 
 import (
 	mysql "github.com/Philio/GoMySQL"
-	ps "perse"
+	ps "github.com/mjarco/perse"
 	"time"
 	"fmt"
 	"strings"
