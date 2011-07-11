@@ -1,6 +1,5 @@
 include $(GOROOT)/src/Make.inc
-GC += -I ../../build/
-TARG=perse/psql
+TARG=github.com/mjarco/perse/psql
 GOFILES=\
 	psql.go\
 
