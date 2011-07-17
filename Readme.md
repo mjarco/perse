@@ -13,17 +13,23 @@ There is no such thing as ModelType per se, but as a user you can define struct 
 Example of ModelType:
     
     import "perse"
-    type struct Tutorial {
+    type Tutorial struct {
         Title    *perse.Char
         Body     *perse.Text
         Date     *perse.Date
+        Section  *perse.Text
         Id       *perse.Serial
     }
 
 Good practice in Go is to write initializer functions:
-
     func NewTutorial() *Tutorial {
-        return &Tutorial{perse.NewChar("", 255), perse.NewText(""), perse.NewDate("2006-01-02 15:04:05"), perse.Serial(0)}
+        return &Tutorial{
+            perse.NewChar("", 255), 
+            perse.NewText(""), 
+            perse.NewDate("2006-01-02 15:04:05"),
+            perse.NewText(""), 
+            perse.NewSerial(0),
+        }
     }
 
 Notice that field types satisfies perse.Field interface.
@@ -88,34 +94,37 @@ Connection
 Each driver package have NewConnection() method which returns perse.Connection interface value. To establish real connection with database use Connect(conndata) method. It''s up to driver implementation which fields in ConnData struct have to be filled.
 
 Once you created connection you can register it in perse package by assigning Conn value to perse.Conn package variable, later on (in runtime) it will be default connection for all perse CRUD and collection queries.
-    
+
+    package main
     import (
-        ps "perse"
-        psql "perse/psql" 
-        "model"
+        "os"
+        ps "github.com/mjarco/perse"
+        mysql "github.com/mjarco/perse/mysql" 
+        "./model"
     )
 
     func main() {
-        conn := psql.NewConnection()
-        ok := ps.Conn.Connect(ps.ConnData{"localhost","3456", "tutorial","tutorial","tutorial",""})
-        if (!ok) {
-            println("connection not established")
-            exit(1)
-        }
+        conn := mysql.NewConnection()
         ps.Conn = conn //setting conn as a default connection in perse package
         //from now on we don''t have to pass connection parameter to perse funcs
+        ok := ps.Conn.Connect(&ps.ConnData{"localhost","3306", "tutorial","tutorial","tutorial",""})
+        if (!ok) {
+            println("connection not established")
+            os.Exit(1)
+        }
+
         //so assumming that in model package Tutorial type is defined you can do:
         v := model.NewTutorial()
         v.Section.Value("first record!")
         v.Body.Value("hello world!")
-        perse.Save(v)
+        ps.Save(v, conn)
         //or alternatively
         mm := map[string]string{"title":"Tutorial title", "body":"Sample tutorial body", "date":"2011-02-01 08:14:00", "id":"0"}
-        v2 := NewTutorial()
-        perse.MapValue(v2, mm)// Title, Body and Date fields have now real values
-        perse.Save(v2)
+        v2 := model.NewTutorial()
+        ps.MapValue(v2, mm)// Title, Body and Date fields have now real values
+        ps.Save(v2, conn)
+    }   
 
-    }
 
 CRUD:  perse.Save [CU], perse.Get [R], perse.Delete [D]
 -------------------------------------------------------
